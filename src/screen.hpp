@@ -12,7 +12,7 @@ class screen {
         bool _invert = false;
         bool outbounds(int x, int y);
     public:
-        screen(int width, int height);
+        screen(unsigned long width, unsigned long height);
         /**
          * Prints out contents of screen in a PPM ASCII format.
          **/

@@ -3,9 +3,9 @@
 #include <stdexcept>
 #include <tuple>
 
-matrix::matrix(int rows, int cols) : data(rows, std::vector<double>(cols)) {}
+matrix::matrix(unsigned long rows, unsigned long cols) : data{rows, std::vector<double>(cols)} {}
 
-matrix::matrix(const std::vector<std::vector<double>>& vector_2d) : data(vector_2d) {
+matrix::matrix(const std::vector<std::vector<double>>& vector_2d) : data{vector_2d} {
     // Check if data has uniform column size
     if(data.size() > 1) {
         int col_size = data[0].size();
@@ -81,7 +81,7 @@ int matrix::height() const {
     return data.size();
 }
 
-edge_matrix::edge_matrix() : matrix(4, 0) {}
+edge_matrix::edge_matrix() : matrix{4, 0} {}
 
 void edge_matrix::add_point(const std::tuple<double, double, double>& point) {
     double x, y, z;

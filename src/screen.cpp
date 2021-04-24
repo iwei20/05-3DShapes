@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-screen::screen(int width, int height) : colorData(height, std::vector<std::tuple<short, short, short>>(width)) {}
+screen::screen(unsigned long width, unsigned long height) : colorData{height, std::vector<std::tuple<short, short, short>>(width)} {}
 
 bool screen::outbounds(int x, int y) {
     return x < 0 || x >= colorData[0].size() || y < 0 || y >= colorData.size();

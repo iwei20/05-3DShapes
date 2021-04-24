@@ -13,7 +13,7 @@ public:
     /**
      * Initializes the matrix with the specified dimensions.
      **/
-    matrix(int rows, int cols);
+    matrix(unsigned long rows, unsigned long cols);
 
     matrix(const std::vector<std::vector<double>>& vec_2d);
     /**
