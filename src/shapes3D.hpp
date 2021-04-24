@@ -18,7 +18,7 @@ class box : public shape {
         std::tuple<double, double, double> m_frontlefttop;
         double m_width, m_height, m_depth;
     public:
-        box(const std::tuple<double, double, double>& m_frontlefttop, double width, double height, double depth);
+        box(const std::tuple<double, double, double>& frontlefttop, double width, double height, double depth);
         void add(edge_matrix& e) const;
 };
 
@@ -36,6 +36,6 @@ class torus : public shape {
         std::tuple<double, double, double> m_center;
         double m_dist_radius, m_cross_radius;
     public:
-        torus(const std::tuple<double, double, double>& center, double m_dist_radius, double m_cross_radius);
+        torus(const std::tuple<double, double, double>& center, double dist_radius, double cross_radius);
         void add(edge_matrix& e) const;
 };
