@@ -15,10 +15,10 @@ class shape {
 
 class box : public shape {
     private:
-        std::tuple<double, double, double> m_frontlefttop;
+        std::tuple<double, double, double> m_lefttopfront;
         double m_width, m_height, m_depth;
     public:
-        box(const std::tuple<double, double, double>& frontlefttop, double width, double height, double depth);
+        box(const std::tuple<double, double, double>& lefttopfront, double width, double height, double depth);
         void add(edge_matrix& e) const;
 };
 
