@@ -98,6 +98,12 @@ void parser::parse(screen& s, std::istream& in) {
         if(line == "display") {
             s.clear();
             s.drawMatrix(_e, {255, 255, 255});
+            std::ofstream fout("temp.ppm");
+            fout << s;
+            fout.close();
+            auto fp = popen("magick display temp.ppm", "w");
+            pclose(fp);
+            remove("temp.ppm");
         }
         if(line == "save") {
             std::string filename;
@@ -105,6 +111,7 @@ void parser::parse(screen& s, std::istream& in) {
             std::ofstream fout(filename);
             fout << s;
             fout.close();
+            std::cout << "Picture can be found at " << filename << "\n";
         }
     }
 }

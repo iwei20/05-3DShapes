@@ -7,14 +7,10 @@ list = $(subst $(sourcedir),$(objdir),$(subst .cpp,.o,$(wildcard $(sourcedir)/*.
 h ?= 800
 w ?= 800
 script ?= script
-pic ?= face
 
 run: build
 	@echo "Running executable..."
 	@./$(targetdir)/main.out $(script) $(w) $(h)
-	@echo "Displaying picture..."
-	-@display $(pic).ppm
-	@echo "Picture can be found at $(pic).ppm"
 
 build: $(targetdir)/main.out
 	@echo "Build finished"
@@ -44,6 +40,6 @@ remove: clean
 	@echo "Removing target directory..."
 	-@rm -r $(targetdir)
 	@echo "Removing picture..."
-	-@rm $(pic).ppm
+	-@rm *.ppm
 	
 .PHONY: run build clean remove
