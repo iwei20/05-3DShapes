@@ -6,8 +6,13 @@ torus 0 0 0 25 200
 apply
 torus 0 0 0 25 200
 sphere 0 0 0 50
+box -28.87 28.87 28.87 57.74 57.74 57.74
+#move 250 250 0
+#apply
+#display
 rotate x 30
 rotate y 30
+rotate z -60
 move 250 250 0
 apply
 display
