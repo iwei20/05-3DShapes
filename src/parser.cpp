@@ -1,7 +1,11 @@
 #include "parser.hpp"
 
 #include "parametric.hpp"
+#include "shapes3D.hpp"
+#include <iostream>
 #include <istream>
+#include <limits>
+#include <sstream>
 #include <string>
 #include <fstream>
 
@@ -9,7 +13,11 @@ void parser::parse(screen& s, std::istream& in) {
     std::string line;
     while(in >> line) {
         if(line[0] == '#') {
+            in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             continue;
+        }
+        if(line[0] == '/' && line[1] == '*') {
+            in.ignore(std::numeric_limits<std::streamsize>::max(), '*');
         }
         if(line == "line") {
             double x1, y1, z1, x2, y2, z2;
@@ -62,6 +70,27 @@ void parser::parse(screen& s, std::istream& in) {
             in >> x0 >> y0 >> x1 >> y1 >> x2 >> y2 >> x3 >> y3;
             bezier_parametric b({x0, y0}, {x1, y1}, {x2, y2}, {x3, y3});
             _e.add_parametric(b.xfunc(), b.yfunc(), const_parametric(0), 100);
+        }
+        if(line == "box") {
+            double x, y, z, w, h, d;
+            in >> x >> y >> z >> w >> h >> d;
+            box b{{x, y, z}, w, h, d};
+            b.add_to(_e);
+        }
+        if(line == "sphere") {
+            double x, y, z, r;
+            in >> x >> y >> z >> r;
+            sphere s{{x, y, z}, r};
+            s.add_to(_e, 100);
+        }
+        if(line == "torus") {
+            double x, y, z, r1, r2;
+            in >> x >> y >> z >> r1 >> r2;
+            torus t{{x, y, z}, r2, r1};
+            t.add_to(_e, 100, 10);
+        }
+        if(line == "clear") {
+            _e = edge_matrix();
         }
         if(line == "apply") {
             _e = _t.get_matrix() * _e;
