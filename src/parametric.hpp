@@ -11,10 +11,19 @@ class bezier_parametric;
 
 class parametric_func {
     public:
+        /**
+         * Gets the value of this function evaluated at t.
+         **/
         virtual double get(double t) const = 0;
+        /**
+         * Returns a vector of [num_vals] results evaluated equally spaced, from t=0 to t=1.
+         **/
         std::vector<double> get_range(int num_vals) const;
 };
 
+/**
+ * Returns a constant no matter what t is.
+ **/
 class const_parametric : public parametric_func {
     private:
         double m_constant;
@@ -23,8 +32,14 @@ class const_parametric : public parametric_func {
         double get(double t) const override;
 };
 
+/**
+ * A container class for two parametric function classes that respectively give the x and y coordinates of a circle based off angle.
+ **/
 class circle_parametric {
     private:
+        /**
+         * Returns rcos(2 * pi * t) + cx
+         **/
         class circle_parametric_x : public parametric_func {
             private:
                 double m_center_x;
@@ -33,7 +48,9 @@ class circle_parametric {
                 circle_parametric_x(double center_x, double radius);
                 double get(double t) const override;
         };
-
+        /**
+         * Returns rsin(2 * pi * t) + cy
+         **/
         class circle_parametric_y : public parametric_func {
             private:
                 double m_center_y;
@@ -50,6 +67,9 @@ class circle_parametric {
         const circle_parametric_y& yfunc() const;
 };
 
+/**
+ * A container class for two parametric function classes that respectively give the x and y coordinates of a hermite spline given t.
+ **/
 class hermite_parametric {
     private:
         static matrix inverse_mult;
@@ -70,6 +90,9 @@ class hermite_parametric {
         hermite_parametric_x parax;
         hermite_parametric_y paray;
     public:
+        /**
+         * Constructs hermite spline parametrics given two points and two pairs of rates of change.
+         **/
         hermite_parametric(
             const std::pair<double, double>& p0, 
             const std::pair<double, double>& p1, 
@@ -80,6 +103,9 @@ class hermite_parametric {
         const hermite_parametric_y& yfunc() const;
 };
 
+/**
+ * A container class for two parametric function classes that respectively give the x and y coordinates of a bezier curve given t.
+ **/
 class bezier_parametric {
     private:
         static matrix binomial_mult;
@@ -102,6 +128,9 @@ class bezier_parametric {
         bezier_parametric_x parax;
         bezier_parametric_y paray;
     public:
+        /**
+         * Constructs bezier curve parametrics given the four points.
+         **/
         bezier_parametric(
             const std::pair<double, double>& p0, 
             const std::pair<double, double>& p1, 
