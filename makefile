@@ -4,8 +4,8 @@ targetdir = bin
 
 list = $(subst $(sourcedir),$(objdir),$(subst .cpp,.o,$(wildcard $(sourcedir)/*.cpp)))
 
-h ?= 800
-w ?= 800
+h ?= 500
+w ?= 500
 script ?= script
 
 run: build
