@@ -10,6 +10,7 @@ class screen {
     private:
         std::vector<std::vector<std::tuple<short, short, short>>> colorData;
         bool _invert = false;
+        bool outbounds_message = true;
         bool outbounds(int x, int y);
     public:
         screen(unsigned long width, unsigned long height);

@@ -64,6 +64,7 @@ void screen::clear() {
 }
 
 void screen::drawMatrix(const edge_matrix& edges, const std::tuple<short, short, short>& color) {
+    outbounds_message = true;
     for(int i = 0; i < edges.width() - 1; i += 2) {
         drawLine({edges.get(0, i), edges.get(1, i)}, {edges.get(0, i + 1), edges.get(1, i + 1)}, color);
     }
@@ -93,7 +94,10 @@ void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b
             while(x <= max_x) {
                 if(outbounds(x, y)) {
                     if(!drawnOff) {
-                        std::cout << "Warning: drawing off screen\n";
+                        if(outbounds_message) {
+                            std::cout << "Warning: drawing off screen\n";
+                            outbounds_message = false;
+                        }
                         drawnOff = true;
                     } 
                 } else {
@@ -112,7 +116,10 @@ void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b
             while(x <= max_x) {
                 if(outbounds(x, y)) {
                     if(!drawnOff) {
-                        std::cout << "Warning: drawing off screen\n";
+                        if(outbounds_message) {
+                            std::cout << "Warning: drawing off screen\n";
+                            outbounds_message = false;
+                        }
                         drawnOff = true;
                     } 
                 } else {
@@ -147,7 +154,10 @@ void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b
             while(y <= max_y) {
                 if(outbounds(x, y)) {
                     if(!drawnOff) {
-                        std::cout << "Warning: drawing off screen\n";
+                        if(outbounds_message) {
+                            std::cout << "Warning: drawing off screen\n";
+                            outbounds_message = false;
+                        }
                         drawnOff = true;
                     } 
                 } else {
@@ -166,7 +176,10 @@ void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b
             while(y <= max_y) {
                 if(outbounds(x, y)) {
                     if(!drawnOff) {
-                        std::cout << "Warning: drawing off screen\n";
+                        if(outbounds_message) {
+                            std::cout << "Warning: drawing off screen\n";
+                            outbounds_message = false;
+                        }
                         drawnOff = true;
                     } 
                 } else {
