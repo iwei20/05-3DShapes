@@ -81,13 +81,13 @@ void parser::parse(screen& s, std::istream& in) {
             double x, y, z, r;
             in >> x >> y >> z >> r;
             sphere s{{x, y, z}, r};
-            s.add_to(_e, 10);
+            s.add_to(_e, 30);
         }
         if(line == "torus") {
             double x, y, z, r1, r2;
             in >> x >> y >> z >> r1 >> r2;
             torus t{{x, y, z}, r2, r1};
-            t.add_to(_e, 20, 10);
+            t.add_to(_e, 80, 25);
         }
         if(line == "clear") {
             _e = edge_matrix();
