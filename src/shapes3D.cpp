@@ -8,7 +8,7 @@ box::box(const std::tuple<double, double, double>& lefttopfront, double width, d
 void box::add_to(edge_matrix& e) const {
     double x0, y0, z0;
     std::tie(x0, y0, z0) = m_lefttopfront;
-    double x1 = x0 + m_width, y1 = y0 + m_height, z1 = z0 + m_depth;
+    double x1 = x0 + m_width, y1 = y0 - m_height, z1 = z0 - m_depth;
 
     e.add_edge({x0, y0, z0}, {x1, y0, z0});
     e.add_edge({x0, y0, z0}, {x0, y1, z0});
