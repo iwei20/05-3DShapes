@@ -68,10 +68,12 @@ std::vector<std::tuple<double, double, double>> torus::get_points(int spt, int p
     const double MULT_PPS = 2.0 / ppslice;
     for (int rot = 0; rot < spt; ++rot) {
         for (int cir = 0; cir < ppslice; ++cir) {
+            double pi_rot_spt = M_PI * rot * MULT_SPT;
+            double pi_cir_pps = M_PI * cir * MULT_PPS;
             std::tuple<double, double, double> point{
-                cos(M_PI * rot * MULT_SPT) * (m_cross_radius * cos(M_PI * cir * MULT_PPS) + m_dist_radius) + std::get<0>(m_center),
-                cos(M_PI * cir * MULT_PPS) + std::get<1>(m_center),
-                -sin(M_PI * rot * MULT_SPT) * (m_cross_radius * sin(M_PI * cir * MULT_PPS) + m_dist_radius) + std::get<2>(m_center)
+                cos(pi_rot_spt) * (m_cross_radius * cos(pi_cir_pps) + m_dist_radius) + std::get<0>(m_center),
+                m_cross_radius * sin(pi_cir_pps) + std::get<1>(m_center),
+                -sin(pi_rot_spt) * (m_cross_radius * cos(pi_cir_pps) + m_dist_radius) + std::get<2>(m_center)
             };
             points.push_back(point);
         }
