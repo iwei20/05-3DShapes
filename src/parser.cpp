@@ -86,8 +86,8 @@ void parser::parse(screen& s, std::istream& in) {
         if(line == "torus") {
             double x, y, z, r1, r2;
             in >> x >> y >> z >> r1 >> r2;
-            torus t{{x, y, z}, r2, r1};
-            t.add_to(_e, 80, 25);
+            torus t{{x, y, z}, r2, r1, 80, 25};
+            t.add_to(_s);
         }
         if(line == "clear") {
             _e = edge_matrix();

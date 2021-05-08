@@ -44,14 +44,15 @@ class torus {
     private:
         std::tuple<double, double, double> m_center;
         double m_dist_radius, m_cross_radius;
+        int m_spt, m_ppslice;
     public:
-        torus(const std::tuple<double, double, double>& center, double dist_radius, double cross_radius);
+        torus(const std::tuple<double, double, double>& center, double dist_radius, double cross_radius, int spt, int ppslice);
         /**
          * Adds all the points from get_points() into an edge matrix.
          */
-        void add_to(edge_matrix& e, int spt, int ppslice) const;
+        void add_to(polygon_matrix& e) const;
         /**
          * Gets points on the surface of a torus, by rotating circles to get [spt] circles and [ppsc] points per circle.
          */
-        std::vector<std::tuple<double, double, double>> get_points(int spt, int ppslice) const;
+        std::vector<std::tuple<double, double, double>> get_points() const;
 };

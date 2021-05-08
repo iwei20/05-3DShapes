@@ -34,7 +34,7 @@ sphere::sphere(const std::tuple<double, double, double>& center, double radius, 
 void sphere::add_to(polygon_matrix& e) const {
     std::vector<std::tuple<double, double, double>> points = get_points();
     // Amogus each row
-    for (int i = 0; i < points.size() - 2 * m_ppsc; i += m_ppsc) {
+    for (int i = 0; i < points.size() - m_ppsc; i += m_ppsc) {
         // Beginning one triangle
         e.add_triangle(points[i], points[i + 1], points[i + m_ppsc + 1]);
         // End one triangle
@@ -72,21 +72,35 @@ std::vector<std::tuple<double, double, double>> sphere::get_points() const {
     return points;
 }
 
-torus::torus(const std::tuple<double, double, double>& center, double dist_radius, double cross_radius)
-: m_center{center}, m_dist_radius{dist_radius}, m_cross_radius{cross_radius} {}
+torus::torus(const std::tuple<double, double, double>& center, double dist_radius, double cross_radius, int spt, int ppslice)
+: m_center{center}, m_dist_radius{dist_radius}, m_cross_radius{cross_radius}, m_spt{spt}, m_ppslice{ppslice} {}
 
-void torus::add_to(edge_matrix& e, int spt, int ppslice) const {
-    for (const std::tuple<double, double, double>& point : get_points(spt, ppslice)) {
-        e.add_edge(point, point);
+void torus::add_to(polygon_matrix& e) const {
+    std::vector<std::tuple<double, double, double>> points = get_points();
+    for (int i = 0; i < points.size() - m_ppslice; i += m_ppslice) {
+        for (int j = i; j < i + m_ppslice - 1; ++j) {
+            e.add_triangle(points[j], points[j + m_ppslice], points[j + 1]);
+            e.add_triangle(points[j + 1], points[j + m_ppslice], points[j + m_ppslice + 1]);
+        }
+        // Last two rows
+        e.add_triangle(points[i + m_ppslice - 1], points[i + 2 * m_ppslice - 1], points[i]);
+        e.add_triangle(points[i], points[i + 2 * m_ppslice - 1], points[i + m_ppslice]);
     }
+    // Last two circles connect
+    for (int j = points.size() - m_ppslice; j < points.size() - 1; ++j) {
+        e.add_triangle(points[j], points[j + m_ppslice - points.size()], points[j + 1]);
+        e.add_triangle(points[j + 1], points[j + m_ppslice - points.size()], points[j + m_ppslice + 1 - points.size()]);
+    }
+    e.add_triangle(points[points.size() - 1], points[m_ppslice - 1], points[points.size() - m_ppslice]);
+    e.add_triangle(points[points.size() - m_ppslice], points[m_ppslice - 1], points[0]);
 }
 
-std::vector<std::tuple<double, double, double>> torus::get_points(int spt, int ppslice) const {
+std::vector<std::tuple<double, double, double>> torus::get_points() const {
     std::vector<std::tuple<double, double, double>> points;
-    const double MULT_SPT = 2.0 / spt;
-    const double MULT_PPS = 2.0 / ppslice;
-    for (int rot = 0; rot < spt; ++rot) {
-        for (int cir = 0; cir < ppslice; ++cir) {
+    const double MULT_SPT = 2.0 / (m_spt - 1);
+    const double MULT_PPS = 2.0 / (m_ppslice - 1);
+    for (int rot = 0; rot < m_spt; ++rot) {
+        for (int cir = 0; cir < m_ppslice; ++cir) {
             double pi_rot_spt = M_PI * rot * MULT_SPT;
             double pi_cir_pps = M_PI * cir * MULT_PPS;
             std::tuple<double, double, double> point{
