@@ -20,7 +20,7 @@ class box {
         /**
          * Adds all the lines of this box to an edge matrix.
          **/
-        void add_to(edge_matrix& e) const;
+        void add_to(polygon_matrix& e) const;
 };
 
 class sphere {

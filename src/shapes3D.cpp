@@ -5,27 +5,29 @@
 box::box(const std::tuple<double, double, double>& lefttopfront, double width, double height, double depth) 
 : m_lefttopfront{lefttopfront}, m_width{width}, m_height{height}, m_depth{depth} {}
 
-void box::add_to(edge_matrix& e) const {
+void box::add_to(polygon_matrix& p) const {
     double x0, y0, z0;
     std::tie(x0, y0, z0) = m_lefttopfront;
     double x1 = x0 + m_width, y1 = y0 - m_height, z1 = z0 - m_depth;
 
-    e.add_edge({x0, y0, z0}, {x1, y0, z0});
-    e.add_edge({x0, y0, z0}, {x0, y1, z0});
-    e.add_edge({x0, y0, z0}, {x0, y0, z1});
-
-    e.add_edge({x1, y0, z0}, {x1, y1, z0});
-    e.add_edge({x1, y0, z0}, {x1, y0, z1});
-    
-    e.add_edge({x0, y1, z0}, {x1, y1, z0});
-    e.add_edge({x0, y1, z0}, {x0, y1, z1});
-
-    e.add_edge({x0, y0, z1}, {x1, y0, z1});
-    e.add_edge({x0, y0, z1}, {x0, y1, z1});
-
-    e.add_edge({x0, y1, z1}, {x1, y1, z1});
-    e.add_edge({x1, y0, z1}, {x1, y1, z1});
-    e.add_edge({x1, y1, z0}, {x1, y1, z1});
+    // Front face
+    p.add_triangle({x0, y0, z0}, {x0, y1, z0}, {x1, y1, z0});
+    p.add_triangle({x0, y0, z0}, {x1, y1, z0}, {x1, y0, z0});
+    // Left face
+    p.add_triangle({x0, y0, z1}, {x0, y1, z0}, {x0, y0, z0});
+    p.add_triangle({x0, y0, z1}, {x0, y1, z1}, {x0, y1, z0});
+    // Right face
+    p.add_triangle({x1, y0, z0}, {x1, y1, z1}, {x1, y0, z1});
+    p.add_triangle({x1, y0, z0}, {x1, y1, z0}, {x1, y1, z1});
+    // Back face
+    p.add_triangle({x1, y0, z1}, {x0, y1, z1}, {x0, y0, z1});
+    p.add_triangle({x1, y0, z1}, {x1, y1, z1}, {x0, y1, z1});
+    // Top face
+    p.add_triangle({x0, y0, z1}, {x1, y0, z0}, {x1, y0, z1});
+    p.add_triangle({x0, y0, z1}, {x0, y0, z0}, {x1, y0, z0});
+    // Bottom face
+    p.add_triangle({x0, y1, z0}, {x1, y1, z1}, {x1, y1, z0});
+    p.add_triangle({x0, y1, z0}, {x0, y1, z1}, {x1, y1, z1});
 }
 
 sphere::sphere(const std::tuple<double, double, double>& center, double radius, int ppsc)

@@ -75,18 +75,18 @@ void parser::parse(screen& s, std::istream& in) {
             double x, y, z, w, h, d;
             in >> x >> y >> z >> w >> h >> d;
             box b{{x, y, z}, w, h, d};
-            b.add_to(_e);
+            b.add_to(_s);
         }
         if(line == "sphere") {
             double x, y, z, r;
             in >> x >> y >> z >> r;
-            sphere s{{x, y, z}, r, 11};
+            sphere s{{x, y, z}, r, (int)r/5};
             s.add_to(_s);
         }
         if(line == "torus") {
             double x, y, z, r1, r2;
             in >> x >> y >> z >> r1 >> r2;
-            torus t{{x, y, z}, r2, r1, 80, 25};
+            torus t{{x, y, z}, r2, r1, (int)r2/2, (int)r1/2};
             t.add_to(_s);
         }
         if(line == "clear") {
