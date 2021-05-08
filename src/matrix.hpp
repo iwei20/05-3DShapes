@@ -79,3 +79,18 @@ class edge_matrix : public matrix {
         void add_parametric(const parametric_func& x, const parametric_func& y, const parametric_func& z, int num_points);
         using matrix::operator=;
 };
+
+class polygon_matrix : public matrix {
+    private:
+        /**
+         * Given tuple (x, y, z), appends x, y, z, and 1 to the end of each row in the edge matrix.
+         **/
+        void add_point(const std::tuple<double, double, double>& point);
+    public:
+        polygon_matrix();
+        /**
+         * Points of the tirangle must be ccw. 
+         **/
+        void add_triangle(const std::tuple<double, double, double>& a, const std::tuple<double, double, double>& b, const std::tuple<double, double, double>& c);
+        using matrix::operator=;
+};

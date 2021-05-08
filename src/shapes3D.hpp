@@ -27,16 +27,17 @@ class sphere {
     private:
         std::tuple<double, double, double> m_center;
         double m_radius;
+        int m_ppsc;
     public:
-        sphere(const std::tuple<double, double, double>& center, double radius);
+        sphere(const std::tuple<double, double, double>& center, double radius, int ppsc);
         /**
          * Adds all the points from get_points() into an edge matrix.
          */
-        void add_to(edge_matrix& e, int ppsc) const;
+        void add_to(polygon_matrix& e) const;
         /**
          * Gets points on the surface of a sphere, by rotating semicircles to get [2 * ppsc] semicircles and [ppsc] points per semicircle.
          */
-        std::vector<std::tuple<double, double, double>> get_points(int ppsc) const;
+        std::vector<std::tuple<double, double, double>> get_points() const;
 };
 
 class torus {

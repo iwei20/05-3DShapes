@@ -80,8 +80,8 @@ void parser::parse(screen& s, std::istream& in) {
         if(line == "sphere") {
             double x, y, z, r;
             in >> x >> y >> z >> r;
-            sphere s{{x, y, z}, r};
-            s.add_to(_e, 30);
+            sphere s{{x, y, z}, r, 30};
+            s.add_to(_s);
         }
         if(line == "torus") {
             double x, y, z, r1, r2;
@@ -91,13 +91,16 @@ void parser::parse(screen& s, std::istream& in) {
         }
         if(line == "clear") {
             _e = edge_matrix();
+            _s = polygon_matrix();
         }
         if(line == "apply") {
             _e = _t.get_matrix() * _e;
+            _s = _t.get_matrix() * _s;
         }
         if(line == "display") {
             s.clear();
             s.drawMatrix(_e, {255, 255, 255});
+            s.drawMatrix(_s, {255, 255, 255});
             std::ofstream fout("temp.ppm");
             fout << s;
             fout.close();

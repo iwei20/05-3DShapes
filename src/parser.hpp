@@ -10,6 +10,7 @@ class parser;
 class parser {
     private:
         edge_matrix _e;
+        polygon_matrix _s;
         transform_manager _t;
     public:
         /**

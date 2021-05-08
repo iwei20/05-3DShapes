@@ -106,3 +106,20 @@ void edge_matrix::add_parametric(const parametric_func& x, const parametric_func
         add_edge({xpoints[i], ypoints[i], zpoints[i]}, {xpoints[i + 1], ypoints[i + 1], zpoints[i + 1]});
     }
 }
+
+polygon_matrix::polygon_matrix() : matrix{4, 0} {}
+
+void polygon_matrix::add_point(const std::tuple<double, double, double>& point) {
+    double x, y, z;
+    std::tie(x, y, z) = point;
+    data[0].push_back(x);
+    data[1].push_back(y);
+    data[2].push_back(z);
+    data[3].push_back(1);
+}
+
+void polygon_matrix::add_triangle(const std::tuple<double, double, double>& a, const std::tuple<double, double, double>& b, const std::tuple<double, double, double>& c) {
+    add_point(a);
+    add_point(b);
+    add_point(c);
+}

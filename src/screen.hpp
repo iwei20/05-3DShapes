@@ -51,6 +51,11 @@ class screen {
         void drawMatrix(const edge_matrix& edges, const std::tuple<short, short, short>& color);
 
         /**
+         * Draws polygon matrix to a screen.
+         **/
+        void drawMatrix(const polygon_matrix& polygons, const std::tuple<short, short, short>& color);
+
+        /**
          * Draws a line from point a to point b. Keep in mind that these points are not (row, col), but (x, y). 
          **/ 
         void drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b, const std::tuple<short, short, short>& color);

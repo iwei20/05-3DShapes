@@ -70,6 +70,15 @@ void screen::drawMatrix(const edge_matrix& edges, const std::tuple<short, short,
     }
 }
 
+void screen::drawMatrix(const polygon_matrix& polygons, const std::tuple<short, short, short>& color) {
+    outbounds_message = true;
+    for(int i = 0; i < polygons.width() - 2; i += 3) {
+        drawLine({polygons.get(0, i), polygons.get(1, i)}, {polygons.get(0, i + 1), polygons.get(1, i + 1)}, color);
+        drawLine({polygons.get(0, i + 1), polygons.get(1, i + 1)}, {polygons.get(0, i + 2), polygons.get(1, i + 2)}, color);
+        drawLine({polygons.get(0, i + 2), polygons.get(1, i + 2)}, {polygons.get(0, i), polygons.get(1, i)}, color);
+    }
+}
+
 void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b, const std::tuple<short, short, short>& color) {
     int dx = (b.first - a.first), dy = (b.second - a.second);
     bool drawnOff = false;

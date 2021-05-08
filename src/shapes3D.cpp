@@ -28,24 +28,34 @@ void box::add_to(edge_matrix& e) const {
     e.add_edge({x1, y1, z0}, {x1, y1, z1});
 }
 
-sphere::sphere(const std::tuple<double, double, double>& center, double radius)
-: m_center{center}, m_radius{radius} {}
+sphere::sphere(const std::tuple<double, double, double>& center, double radius, int ppsc)
+: m_center{center}, m_radius{radius}, m_ppsc{ppsc} {}
 
-void sphere::add_to(edge_matrix& e, int ppsc) const {
-    for (const std::tuple<double, double, double>& point : get_points(ppsc)) {
-        e.add_edge(point, point);
+void sphere::add_to(polygon_matrix& e) const {
+    std::vector<std::tuple<double, double, double>> points = get_points();
+    // Amogus each row
+    for (int i = 0; i < points.size(); i += m_ppsc) {
+        // Beginning one triangle
+        e.add_triangle(points[i], points[i + 1], points[i + m_ppsc + 1]);
+        // End one triangle
+        e.add_triangle(points[i + m_ppsc - 2], points[i + m_ppsc - 1], points[i + 2 * m_ppsc - 1]);
+        // Triangles in between
+        for(int j = i + 1; j < i + m_ppsc - 2; ++j) {
+            e.add_triangle(points[j], points[j + 1], points[j + m_ppsc + 1]);
+            e.add_triangle(points[j], points[j + m_ppsc + 1], points[j + m_ppsc]);
+        }
     }
 }
 
-std::vector<std::tuple<double, double, double>> sphere::get_points(int ppsc) const {
+std::vector<std::tuple<double, double, double>> sphere::get_points() const {
     std::vector<std::tuple<double, double, double>> points;
-    const double MULT_PPSC = 1.0 / ppsc;
-    for (int rot = 0; rot < 2 * ppsc; ++rot) {
-        for (int cir = 0; cir < ppsc ; ++cir) {
+    const double MULT_PPSC = M_PI / m_ppsc;
+    for (int rot = 0; rot < 2 * m_ppsc; ++rot) {
+        for (int cir = 0; cir < m_ppsc ; ++cir) {
             std::tuple<double, double, double> point{
-                m_radius * cos(M_PI * cir * MULT_PPSC) + std::get<0>(m_center),
-                m_radius * sin(M_PI * cir * MULT_PPSC) * cos(M_PI * rot * MULT_PPSC) + std::get<1>(m_center),
-                m_radius * sin(M_PI * cir * MULT_PPSC) * sin(M_PI * rot * MULT_PPSC) + std::get<2>(m_center)
+                m_radius * cos(cir * MULT_PPSC) + std::get<0>(m_center),
+                m_radius * sin(cir * MULT_PPSC) * cos(rot * MULT_PPSC) + std::get<1>(m_center),
+                m_radius * sin(cir * MULT_PPSC) * sin(rot * MULT_PPSC) + std::get<2>(m_center)
             };
             points.push_back(point);
         }
