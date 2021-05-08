@@ -70,12 +70,39 @@ void screen::drawMatrix(const edge_matrix& edges, const std::tuple<short, short,
     }
 }
 
+bool screen::include_cull(const std::tuple<double, double, double>& a, const std::tuple<double, double, double>& b, const std::tuple<double, double, double>& c) {
+    // Two vectors along edges of polygon
+    double Ax = std::get<0>(b) - std::get<0>(a),
+           Ay = std::get<1>(b) - std::get<1>(a),
+           Az = std::get<2>(b) - std::get<2>(a);
+    double Bx = std::get<0>(c) - std::get<0>(a),
+           By = std::get<1>(c) - std::get<1>(a),
+           Bz = std::get<2>(c) - std::get<2>(a);
+    // Cross product to get normal
+    double Nx = Ay * Bz - Az * By, 
+           Ny = Az * Bx - Ax * Bz, 
+           Nz = Ax * By - Ay * Bx;
+    // View vector (normalized)
+    double Vx = 0,
+           Vy = 0,
+           Vz = 1;
+    // Dot product view vector and normal vector
+    double costheta = Nx * Vx + Ny * Vy + Nz * Vz;
+    return costheta > 0;
+}
+
 void screen::drawMatrix(const polygon_matrix& polygons, const std::tuple<short, short, short>& color) {
     outbounds_message = true;
     for(int i = 0; i < polygons.width() - 2; i += 3) {
-        drawLine({polygons.get(0, i), polygons.get(1, i)}, {polygons.get(0, i + 1), polygons.get(1, i + 1)}, color);
-        drawLine({polygons.get(0, i + 1), polygons.get(1, i + 1)}, {polygons.get(0, i + 2), polygons.get(1, i + 2)}, color);
-        drawLine({polygons.get(0, i + 2), polygons.get(1, i + 2)}, {polygons.get(0, i), polygons.get(1, i)}, color);
+        if(include_cull(
+            {polygons.get(0, i), polygons.get(1, i), polygons.get(2, i)},
+            {polygons.get(0, i + 1), polygons.get(1, i + 1), polygons.get(2, i + 1)},
+            {polygons.get(0, i + 2), polygons.get(1, i + 2), polygons.get(2, i + 2)}
+        )) {
+            drawLine({polygons.get(0, i), polygons.get(1, i)}, {polygons.get(0, i + 1), polygons.get(1, i + 1)}, color);
+            drawLine({polygons.get(0, i + 1), polygons.get(1, i + 1)}, {polygons.get(0, i + 2), polygons.get(1, i + 2)}, color);
+            drawLine({polygons.get(0, i + 2), polygons.get(1, i + 2)}, {polygons.get(0, i), polygons.get(1, i)}, color);
+        }
     }
 }
 

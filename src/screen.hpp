@@ -12,6 +12,10 @@ class screen {
         bool _invert = false;
         bool outbounds_message = true;
         bool outbounds(int x, int y);
+        /**
+         * True if angle between 90 and -90
+         **/
+        bool include_cull(const std::tuple<double, double, double>& a, const std::tuple<double, double, double>& b, const std::tuple<double, double, double>& c);
     public:
         screen(unsigned long width, unsigned long height);
         /**
