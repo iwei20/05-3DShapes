@@ -20,7 +20,7 @@ class box {
         /**
          * Adds all the lines of this box to an edge matrix.
          **/
-        void add_to(polygon_matrix& e) const;
+        void add_to(polygon_matrix& p) const;
 };
 
 class sphere {
@@ -33,7 +33,7 @@ class sphere {
         /**
          * Adds all the points from get_points() into an edge matrix.
          */
-        void add_to(polygon_matrix& e) const;
+        void add_to(polygon_matrix& p) const;
         /**
          * Gets points on the surface of a sphere, by rotating semicircles to get [2 * ppsc] semicircles and [ppsc] points per semicircle.
          */
@@ -50,7 +50,7 @@ class torus {
         /**
          * Adds all the points from get_points() into an edge matrix.
          */
-        void add_to(polygon_matrix& e) const;
+        void add_to(polygon_matrix& p) const;
         /**
          * Gets points on the surface of a torus, by rotating circles to get [spt] circles and [ppsc] points per circle.
          */
