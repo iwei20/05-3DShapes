@@ -80,7 +80,7 @@ void parser::parse(screen& s, std::istream& in) {
         if(line == "sphere") {
             double x, y, z, r;
             in >> x >> y >> z >> r;
-            sphere s{{x, y, z}, r, 30};
+            sphere s{{x, y, z}, r, 11};
             s.add_to(_s);
         }
         if(line == "torus") {

@@ -34,22 +34,31 @@ sphere::sphere(const std::tuple<double, double, double>& center, double radius, 
 void sphere::add_to(polygon_matrix& e) const {
     std::vector<std::tuple<double, double, double>> points = get_points();
     // Amogus each row
-    for (int i = 0; i < points.size(); i += m_ppsc) {
+    for (int i = 0; i < points.size() - 2 * m_ppsc; i += m_ppsc) {
         // Beginning one triangle
         e.add_triangle(points[i], points[i + 1], points[i + m_ppsc + 1]);
         // End one triangle
-        e.add_triangle(points[i + m_ppsc - 2], points[i + m_ppsc - 1], points[i + 2 * m_ppsc - 1]);
+        e.add_triangle(points[i + m_ppsc - 2], points[i + m_ppsc - 1], points[i + 2 * m_ppsc - 2]);
         // Triangles in between
         for(int j = i + 1; j < i + m_ppsc - 2; ++j) {
             e.add_triangle(points[j], points[j + 1], points[j + m_ppsc + 1]);
             e.add_triangle(points[j], points[j + m_ppsc + 1], points[j + m_ppsc]);
         }
     }
+    // Last row
+    e.add_triangle(points[points.size() - m_ppsc], points[points.size() - m_ppsc + 1], points[1]);
+    // End one triangle
+    e.add_triangle(points[points.size() - 2], points[points.size() - 1], points[m_ppsc - 3]);
+    // Triangles in between
+    for(int j = points.size() - m_ppsc + 1; j < points.size() - 2; ++j) {
+        e.add_triangle(points[j], points[j + 1], points[j + 1 + m_ppsc - points.size()]);
+        e.add_triangle(points[j], points[j + 1 + m_ppsc - points.size()], points[j + m_ppsc - points.size()]);
+    }
 }
 
 std::vector<std::tuple<double, double, double>> sphere::get_points() const {
     std::vector<std::tuple<double, double, double>> points;
-    const double MULT_PPSC = M_PI / m_ppsc;
+    const double MULT_PPSC = M_PI / (m_ppsc - 1);
     for (int rot = 0; rot < 2 * m_ppsc; ++rot) {
         for (int cir = 0; cir < m_ppsc ; ++cir) {
             std::tuple<double, double, double> point{
