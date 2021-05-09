@@ -1,5 +1,6 @@
 #include "screen.hpp"
 
+#include "vector3D.hpp"
 #include <iostream>
 
 screen::screen(unsigned long width, unsigned long height) : colorData{height, std::vector<std::tuple<short, short, short>>(width)} {}
@@ -71,24 +72,12 @@ void screen::drawMatrix(const edge_matrix& edges, const std::tuple<short, short,
 }
 
 bool screen::include_cull(const std::tuple<double, double, double>& a, const std::tuple<double, double, double>& b, const std::tuple<double, double, double>& c) {
-    // Two vectors along edges of polygon
-    double Ax = std::get<0>(b) - std::get<0>(a),
-           Ay = std::get<1>(b) - std::get<1>(a),
-           Az = std::get<2>(b) - std::get<2>(a);
-    double Bx = std::get<0>(c) - std::get<0>(a),
-           By = std::get<1>(c) - std::get<1>(a),
-           Bz = std::get<2>(c) - std::get<2>(a);
-    // Cross product to get normal
-    double Nx = Ay * Bz - Az * By, 
-           Ny = Az * Bx - Ax * Bz, 
-           Nz = Ax * By - Ay * Bx;
-    // View vector (normalized)
-    double Vx = 0,
-           Vy = 0,
-           Vz = 1;
-    // Dot product view vector and normal vector
-    double costheta = Nx * Vx + Ny * Vy + Nz * Vz;
-    return costheta > 0;
+    /*
+    vector3D A{b - a}, B{c - a}; // Two vectors along edges of triangle
+    vector3D N = vector3D::cross(A, B); // Normal
+    vector3D V{0, 0, 1}; // View vector (normalized)
+    */
+    return vector3D::dot(vector3D::cross(b - a, c - a), vector3D{0, 0, 1}) > 0; // Dot product gives cosine
 }
 
 void screen::drawMatrix(const polygon_matrix& polygons, const std::tuple<short, short, short>& color) {
