@@ -1,9 +1,0 @@
-torus 0 0 0 50 200
-torus 0 100 0 50 200
-torus 0 200 0 50 200
-sphere 0 300 0 150
-move 250 100 0
-rotate x 20
-apply
-display
-save stacks.ppm

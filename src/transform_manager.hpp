@@ -3,10 +3,11 @@
 class transform_manager;
 
 #include "matrix.hpp"
+#include <stack>
 
 class transform_manager {
     private:
-        matrix m;
+        std::stack<matrix> s;
     public:
         /**
          * Creates an object that holds a transformation matrix, initialized to an identity matrix, which can be operated on.
@@ -39,12 +40,18 @@ class transform_manager {
         void zRot(double degrees);
 
         /**
-         * Returns a reference to the matrix.
+         * Returns a reference to the matrix on the top of the transform stack.
          **/
-        const matrix& get_matrix();
+        const matrix& get_top() const;
 
         /**
-         * Replaces the matrix reference with a new identity matrix.
+         * Copies the top transformation into another layer on the stack
          **/
-        void reset();
+        void push();
+
+        /**
+         * Removes the top relative coordinate system.
+         **/
+        void pop();
+
 };
