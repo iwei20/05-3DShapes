@@ -1,3 +1,5 @@
+# globe
+push
 move 250 100 0
 rotate y -20
 rotate x 20
@@ -7,5 +9,18 @@ move 0 150 0
 sphere 0 0 0 100
 rotate z 45
 torus 0 0 0 20 200
+
+# text
+pop
+pop
+move 10 440 0
+
+# E
+line 0 0 0 0 50 0
+line 0 0 0 20 0 0
+line 0 25 0 20 25 0
+line 0 50 0 20 50 0
+# move 60 
+
 display
 save globe.ppm
