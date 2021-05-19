@@ -5,8 +5,8 @@ rotate y -20
 rotate x 20
 box -50 50 50 100 100 100
 push
-move 0 150 0
-sphere 0 0 0 100
+move 0 200 0
+sphere 0 0 0 150
 rotate z 45
 torus 0 0 0 20 200
 
@@ -20,7 +20,25 @@ line 0 0 0 0 50 0
 line 0 0 0 20 0 0
 line 0 25 0 20 25 0
 line 0 50 0 20 50 0
-# move 60 
+
+move 30 0 0
+
+#A
+line 0 0 0 25 50 0
+line 25 50 0 50 0 0
+line 13 25 0 37 25 0
+
+move 40 0 0
+
+#T 
+line 0 50 0 50 50 0
+line 25 50 0 25 0 0
+
+move 60 0 0 
+# H
+line 0 0 0 0 50 0
+line 0 25 0 30 25 0 
+line 30 0 0 30 50 0
 
 display
 save globe.ppm
