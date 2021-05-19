@@ -48,14 +48,15 @@ void sphere::add_to(polygon_matrix& p) const {
         }
     }
     // Last row
-    p.add_triangle(points[points.size() - m_ppsc], points[points.size() - m_ppsc + 1], points[1]);
+    /*
+    p.add_triangle(points[points.size() - m_ppsc], points[1], points[points.size() - m_ppsc + 1]);
     // End one triangle
     p.add_triangle(points[points.size() - 2], points[points.size() - 1], points[m_ppsc - 3]);
     // Triangles in between
     for(int j = points.size() - m_ppsc + 1; j < points.size() - 2; ++j) {
-        p.add_triangle(points[j], points[j + 1], points[j + 1 + m_ppsc - points.size()]);
-        p.add_triangle(points[j], points[j + 1 + m_ppsc - points.size()], points[j + m_ppsc - points.size()]);
-    }
+        p.add_triangle(points[j], points[j + 1 + m_ppsc - points.size()], points[j + 1]);
+        p.add_triangle(points[j], points[j + m_ppsc - points.size()], points[j + 1 + m_ppsc - points.size()]);
+    }*/
 }
 
 std::vector<std::tuple<double, double, double>> sphere::get_points() const {
@@ -89,12 +90,13 @@ void torus::add_to(polygon_matrix& p) const {
         p.add_triangle(points[i], points[i + 2 * m_ppslice - 1], points[i + m_ppslice]);
     }
     // Last two circles connect
+    /*
     for (int j = points.size() - m_ppslice; j < points.size() - 1; ++j) {
         p.add_triangle(points[j], points[j + m_ppslice - points.size()], points[j + 1]);
         p.add_triangle(points[j + 1], points[j + m_ppslice - points.size()], points[j + m_ppslice + 1 - points.size()]);
     }
     p.add_triangle(points[points.size() - 1], points[m_ppslice - 1], points[points.size() - m_ppslice]);
-    p.add_triangle(points[points.size() - m_ppslice], points[m_ppslice - 1], points[0]);
+    p.add_triangle(points[points.size() - m_ppslice], points[m_ppslice - 1], points[0]);*/
 }
 
 std::vector<std::tuple<double, double, double>> torus::get_points() const {
