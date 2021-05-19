@@ -121,7 +121,6 @@ void parser::parse(screen& s, std::istream& in) {
             auto fp = popen("magick display temp.ppm", "w");
             pclose(fp);
             remove("temp.ppm");
-            s.clear();
         }
         if(line == "save") {
             std::string filename;
