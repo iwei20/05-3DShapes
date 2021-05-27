@@ -114,6 +114,9 @@ void parser::parse(screen& s, std::istream& in) {
             s.drawMatrix(_s, {255, 255, 255}, {100, 100, 100});
             _s = polygon_matrix();
         }
+        if(line == "clear") {
+            s.clear();
+        }
         if(line == "display") {
             std::ofstream fout("temp.ppm");
             fout << s;

@@ -13,12 +13,13 @@ class zbuffer {
         zbuffer(unsigned long width, unsigned long height);
 
         std::vector<double>& operator[](int index);
+        void reset();
 };
 
 class screen {
     private:
         std::vector<std::vector<std::tuple<short, short, short>>> colorData;
-        zbuffer z;
+        zbuffer zbuf;
         bool _invert = false;
         bool outbounds_message = true;
         bool outbounds(int x, int y);
@@ -72,10 +73,10 @@ class screen {
         /**
          * Draws a line from point a to point b. Keep in mind that these points are not (row, col), but (x, y). 
          **/ 
-        void drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b, const std::tuple<short, short, short>& color, zbuffer& zbuf);
+        void drawLine(const std::tuple<int, int, double>& a, const std::tuple<int, int, double>& b, const std::tuple<short, short, short>& color);
 
         /**
          * Draws a scanline
          **/
-        void drawScanLine(double x0, double x1, double y, const std::tuple<short, short, short>& color, zbuffer& zbuf);
+        void drawScanLine(int x0, int x1, int y, double z0, double z1, const std::tuple<short, short, short>& color);
 };

@@ -3,13 +3,22 @@
 #include "vector3D.hpp"
 #include <iostream>
 #include <algorithm>
+#include <numeric>
 
-zbuffer::zbuffer(unsigned long width, unsigned long height) : zvalues{height, std::vector<double>(width)} {}
+zbuffer::zbuffer(unsigned long width, unsigned long height) : zvalues{height, std::vector<double>(width, std::numeric_limits<double>::lowest())} {}
 std::vector<double>& zbuffer::operator[](int index) {
     return zvalues[index];
 }
 
-screen::screen(unsigned long width, unsigned long height) : colorData{height, std::vector<std::tuple<short, short, short>>(width)}, z{width, height} {}
+void zbuffer::reset() {
+    for(int i = 0; i < zvalues.size(); ++i) {
+        for(int j = 0; j < zvalues[0].size(); ++j) {
+            zvalues[i][j] = std::numeric_limits<double>::lowest();
+        }
+    }
+}
+
+screen::screen(unsigned long width, unsigned long height) : colorData{height, std::vector<std::tuple<short, short, short>>(width)}, zbuf{width, height} {}
 
 bool screen::outbounds(int x, int y) {
     return x < 0 || x >= colorData[0].size() || y < 0 || y >= colorData.size();
@@ -68,12 +77,13 @@ void screen::clear() {
             colorData[i][j] = {0, 0, 0};
         }
     }
+    zbuf = zbuffer(colorData.size(), colorData[0].size());
 }
 
 void screen::drawMatrix(const edge_matrix& edges, const std::tuple<short, short, short>& color) {
     outbounds_message = true;
     for(int i = 0; i < edges.width() - 1; i += 2) {
-        drawLine({edges.get(0, i), edges.get(1, i)}, {edges.get(0, i + 1), edges.get(1, i + 1)}, color, z);
+        drawLine({edges.get(0, i), edges.get(1, i), edges.get(2, i)}, {edges.get(0, i + 1), edges.get(1, i + 1), edges.get(2, i + 1)}, color);
     }
 }
 
@@ -94,11 +104,6 @@ void screen::drawMatrix(const polygon_matrix& polygons, const std::tuple<short, 
             {polygons.get(0, i + 1), polygons.get(1, i + 1), polygons.get(2, i + 1)},
             {polygons.get(0, i + 2), polygons.get(1, i + 2), polygons.get(2, i + 2)}
         )) {
-            // Edges 
-            drawLine({polygons.get(0, i), polygons.get(1, i)}, {polygons.get(0, i + 1), polygons.get(1, i + 1)}, color, z);
-            drawLine({polygons.get(0, i + 1), polygons.get(1, i + 1)}, {polygons.get(0, i + 2), polygons.get(1, i + 2)}, color, z);
-            drawLine({polygons.get(0, i + 2), polygons.get(1, i + 2)}, {polygons.get(0, i), polygons.get(1, i)}, color, z);
-            
             // Sort by bottom, middle, top
             std::tuple<double, double, double> points[3] = {
                 {polygons.get(0, i), polygons.get(1, i), polygons.get(2, i)},
@@ -111,49 +116,70 @@ void screen::drawMatrix(const polygon_matrix& polygons, const std::tuple<short, 
                 }
             );
 
+            std::tuple<short, short, short> randColor = {rand() % 255, rand() % 255, rand() % 255};
             // Iterating from bottom to mid
             int curr_y = std::get<1>(points[0]),
                 mid_y = std::get<1>(points[1]),
                 max_y = std::get<1>(points[2]);
-            std::cout << curr_y << " " << mid_y << " " << max_y << "\n";
             double x_bt = std::get<0>(points[0]),
                    dx0 = (std::get<0>(points[2]) - std::get<0>(points[0])) / (std::get<1>(points[2]) - std::get<1>(points[0])),
                    x_bmt = std::get<0>(points[0]),
                    dx1 = (std::get<0>(points[1]) - std::get<0>(points[0])) / (std::get<1>(points[1]) - std::get<1>(points[0])),
                    dx2 = (std::get<0>(points[2]) - std::get<0>(points[1])) / (std::get<1>(points[2]) - std::get<1>(points[1]));
-            for(; curr_y < mid_y; ++curr_y) {
-                drawLine({x_bt, curr_y}, {x_bmt, curr_y}, fill, z); // Replace with drawScanLine
+            double z_bt = std::get<2>(points[0]),
+                   z_bmt = std::get<2>(points[0]),
+                   dz0 = (std::get<2>(points[2]) - std::get<2>(points[0])) / (std::get<1>(points[2]) - std::get<1>(points[0])),
+                   dz1 = (std::get<2>(points[1]) - std::get<2>(points[0])) / (std::get<1>(points[1]) - std::get<1>(points[0])),
+                   dz2 = (std::get<2>(points[2]) - std::get<2>(points[1])) / (std::get<1>(points[2]) - std::get<1>(points[1]));
+            curr_y++;
+            for(; curr_y <= mid_y; curr_y++) {
+                drawScanLine(x_bt, x_bmt, curr_y, z_bt, z_bmt, randColor); // Replace with drawScanLine
                 x_bt += dx0;
                 x_bmt += dx1;
+                z_bt += dz0;
+                z_bmt += dz1;
             }
             x_bmt = std::get<0>(points[1]);
-            for(; curr_y < max_y; ++curr_y) {
-                drawLine({x_bt, curr_y}, {x_bmt, curr_y}, fill, z);
+            z_bmt = std::get<2>(points[1]);
+            for(; curr_y <= max_y; curr_y++) {
+                drawScanLine(x_bt, x_bmt, curr_y, z_bt, z_bmt, randColor);
                 x_bt += dx0;
                 x_bmt += dx2;
+                z_bt += dz0;
+                z_bmt += dz2;
             }
 
+            // Edges 
+            
+            drawLine({polygons.get(0, i), polygons.get(1, i), polygons.get(2, i)}, {polygons.get(0, i + 1), polygons.get(1, i + 1), polygons.get(2, i + 1)}, color);
+            drawLine({polygons.get(0, i + 1), polygons.get(1, i + 1),  polygons.get(2, i + 1)}, {polygons.get(0, i + 2), polygons.get(1, i + 2), polygons.get(2, i + 2)}, color);
+            drawLine({polygons.get(0, i + 2), polygons.get(1, i + 2),  polygons.get(2, i + 2)}, {polygons.get(0, i), polygons.get(1, i), polygons.get(2, i)}, color);
+            
         }
     }
 }
 
-void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b, const std::tuple<short, short, short>& color, zbuffer& zbuf) {
-    int dx = (b.first - a.first), dy = (b.second - a.second);
+void screen::drawLine(const std::tuple<int, int, double>& a, const std::tuple<int, int, double>& b, const std::tuple<short, short, short>& color) {
+    int dx = (std::get<0>(b) - std::get<0>(a)), dy = (std::get<1>(b) - std::get<1>(a));
+    double dz = (std::get<2>(b) - std::get<2>(a));
     bool drawnOff = false;
 
     // Gentler slopes
     if(abs(dx) >= abs(dy)) {
         
         int max_x, x, y;
-        if(a.first <= b.first) {
-            std::tie(x, y) = a;
-            max_x = b.first;
+        double z, dzppx;
+        if(std::get<0>(a) <= std::get<0>(b)) {
+            std::tie(x, y, z) = a;
+            max_x = std::get<0>(b);
         } else {
-            std::tie(x, y) = b;
-            max_x = a.first;
-            dx = -1 * dx;
-            dy = -1 * dy;
+            std::tie(x, y, z) = b;
+            max_x = std::get<0>(a);
+            dx *= -1;
+            dy *= -1;
+            dz *= -1;
         }
+        dzppx = dz / (max_x - x + 1);
 
         // Octant 1 and 5
         if(dy >= 0) {
@@ -167,8 +193,9 @@ void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b
                         }
                         drawnOff = true;
                     } 
-                } else {
+                } else if (z > zbuf[y][x]) {
                     colorData[y][x] = color;
+                    zbuf[y][x] = z;
                 }
                 if(midCompare >= 0) {
                     ++y;
@@ -176,6 +203,7 @@ void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b
                 }
                 midCompare += 2 * dy;
                 ++x;
+                z += dzppx;
             }
         // Octant 4 and 8
         } else {
@@ -189,8 +217,9 @@ void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b
                         }
                         drawnOff = true;
                     } 
-                } else {
+                } else if (z > zbuf[y][x]) {
                     colorData[y][x] = color;
+                    zbuf[y][x] = z;
                 }
                 if(midCompare <= 0) {
                     --y;
@@ -198,6 +227,7 @@ void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b
                 }
                 midCompare += 2 * dy;
                 ++x;
+                z += dzppx;
             }
         }
     
@@ -205,15 +235,18 @@ void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b
     } else {
 
         int max_y, x, y;
-        if(a.second <= b.second) {
-            std::tie(x, y) = a;
-            max_y = b.second;
+        double z, dzppx;
+        if(std::get<1>(a) <= std::get<1>(b)) {
+            std::tie(x, y, z) = a;
+            max_y = std::get<1>(b);
         } else {
-            std::tie(x, y) = b;
-            max_y = a.second;
-            dx = -1 * dx;
-            dy = -1 * dy;
+            std::tie(x, y, z) = b;
+            max_y = std::get<1>(a);
+            dx *= -1;
+            dy *= -1;
+            dz *= -1;
         }
+        dzppx = dz / (max_y - y + 1);
 
         // Octant 2 and 6
         if(dx >= 0) {
@@ -227,8 +260,9 @@ void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b
                         }
                         drawnOff = true;
                     } 
-                } else {
+                } else if (z > zbuf[y][x]) {
                     colorData[y][x] = color;
+                    zbuf[y][x] = z;
                 }
                 if(midCompare <= 0) {
                     ++x;
@@ -236,6 +270,7 @@ void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b
                 }
                 midCompare -= 2 * dx;
                 ++y;
+                z += dzppx;
             }
         // Octant 3 and 7
         } else {
@@ -249,8 +284,9 @@ void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b
                         }
                         drawnOff = true;
                     } 
-                } else {
+                } else if (z > zbuf[y][x]) {
                     colorData[y][x] = color;
+                    zbuf[y][x] = z;
                 }
                 if(midCompare >= 0) {
                     --x;
@@ -258,12 +294,30 @@ void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b
                 }
                 midCompare -= 2 * dx;
                 ++y;
+                z += dzppx;
             }
         }
     }
 
 }
 
-void screen::drawScanLine(double x0, double x1, double y, const std::tuple<short, short, short>& color, zbuffer& zbuf) {
-
+void screen::drawScanLine(int x0, int x1, int y, double z0, double z1, const std::tuple<short, short, short>& color) {
+    int left_x, right_x;
+    double left_z, right_z; 
+    if(x0 <= x1) {
+        left_x = x0, right_x = x1;
+        left_z = z0, right_z = z1;
+    } else {
+        left_x = x1, right_x = x0;
+        left_z = z1, right_z = z0;
+    }
+    double dz = (right_z - left_z) / (right_x - left_x + 1);
+    double curr_z = left_z + dz;
+    for(int i = left_x; i <= right_x; ++i) {
+        if(curr_z > zbuf[y][i]) {
+            colorData[y][i] = color;
+            zbuf[y][i] = curr_z;
+        }
+        curr_z += dz;
+    }
 }
