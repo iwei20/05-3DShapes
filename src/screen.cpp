@@ -2,8 +2,14 @@
 
 #include "vector3D.hpp"
 #include <iostream>
+#include <algorithm>
 
-screen::screen(unsigned long width, unsigned long height) : colorData{height, std::vector<std::tuple<short, short, short>>(width)} {}
+zbuffer::zbuffer(unsigned long width, unsigned long height) : zvalues{height, std::vector<double>(width)} {}
+std::vector<double>& zbuffer::operator[](int index) {
+    return zvalues[index];
+}
+
+screen::screen(unsigned long width, unsigned long height) : colorData{height, std::vector<std::tuple<short, short, short>>(width)}, z{width, height} {}
 
 bool screen::outbounds(int x, int y) {
     return x < 0 || x >= colorData[0].size() || y < 0 || y >= colorData.size();
@@ -67,7 +73,7 @@ void screen::clear() {
 void screen::drawMatrix(const edge_matrix& edges, const std::tuple<short, short, short>& color) {
     outbounds_message = true;
     for(int i = 0; i < edges.width() - 1; i += 2) {
-        drawLine({edges.get(0, i), edges.get(1, i)}, {edges.get(0, i + 1), edges.get(1, i + 1)}, color);
+        drawLine({edges.get(0, i), edges.get(1, i)}, {edges.get(0, i + 1), edges.get(1, i + 1)}, color, z);
     }
 }
 
@@ -80,7 +86,7 @@ bool screen::include_cull(const std::tuple<double, double, double>& a, const std
     return vector3D::dot(vector3D::cross(b - a, c - a), vector3D{0, 0, 1}) > 0; // Dot product gives cosine
 }
 
-void screen::drawMatrix(const polygon_matrix& polygons, const std::tuple<short, short, short>& color) {
+void screen::drawMatrix(const polygon_matrix& polygons, const std::tuple<short, short, short>& color, const std::tuple<short, short, short>& fill) {
     outbounds_message = true;
     for(int i = 0; i < polygons.width() - 2; i += 3) {
         if(include_cull(
@@ -88,14 +94,50 @@ void screen::drawMatrix(const polygon_matrix& polygons, const std::tuple<short, 
             {polygons.get(0, i + 1), polygons.get(1, i + 1), polygons.get(2, i + 1)},
             {polygons.get(0, i + 2), polygons.get(1, i + 2), polygons.get(2, i + 2)}
         )) {
-            drawLine({polygons.get(0, i), polygons.get(1, i)}, {polygons.get(0, i + 1), polygons.get(1, i + 1)}, color);
-            drawLine({polygons.get(0, i + 1), polygons.get(1, i + 1)}, {polygons.get(0, i + 2), polygons.get(1, i + 2)}, color);
-            drawLine({polygons.get(0, i + 2), polygons.get(1, i + 2)}, {polygons.get(0, i), polygons.get(1, i)}, color);
+            // Edges 
+            drawLine({polygons.get(0, i), polygons.get(1, i)}, {polygons.get(0, i + 1), polygons.get(1, i + 1)}, color, z);
+            drawLine({polygons.get(0, i + 1), polygons.get(1, i + 1)}, {polygons.get(0, i + 2), polygons.get(1, i + 2)}, color, z);
+            drawLine({polygons.get(0, i + 2), polygons.get(1, i + 2)}, {polygons.get(0, i), polygons.get(1, i)}, color, z);
+            
+            // Sort by bottom, middle, top
+            std::tuple<double, double, double> points[3] = {
+                {polygons.get(0, i), polygons.get(1, i), polygons.get(2, i)},
+                {polygons.get(0, i + 1), polygons.get(1, i + 1), polygons.get(2, i + 1)},
+                {polygons.get(0, i + 2), polygons.get(1, i + 2), polygons.get(2, i + 2)}
+            };
+            std::sort(points, points + 3, 
+                [](const std::tuple<double, double, double>& a, const std::tuple<double, double, double>& b) -> bool {
+                    return std::get<1>(a) < std::get<1>(b);
+                }
+            );
+
+            // Iterating from bottom to mid
+            int curr_y = std::get<1>(points[0]),
+                mid_y = std::get<1>(points[1]),
+                max_y = std::get<1>(points[2]);
+            std::cout << curr_y << " " << mid_y << " " << max_y << "\n";
+            double x_bt = std::get<0>(points[0]),
+                   dx0 = (std::get<0>(points[2]) - std::get<0>(points[0])) / (std::get<1>(points[2]) - std::get<1>(points[0])),
+                   x_bmt = std::get<0>(points[0]),
+                   dx1 = (std::get<0>(points[1]) - std::get<0>(points[0])) / (std::get<1>(points[1]) - std::get<1>(points[0])),
+                   dx2 = (std::get<0>(points[2]) - std::get<0>(points[1])) / (std::get<1>(points[2]) - std::get<1>(points[1]));
+            for(; curr_y < mid_y; ++curr_y) {
+                drawLine({x_bt, curr_y}, {x_bmt, curr_y}, fill, z); // Replace with drawScanLine
+                x_bt += dx0;
+                x_bmt += dx1;
+            }
+            x_bmt = std::get<0>(points[1]);
+            for(; curr_y < max_y; ++curr_y) {
+                drawLine({x_bt, curr_y}, {x_bmt, curr_y}, fill, z);
+                x_bt += dx0;
+                x_bmt += dx2;
+            }
+
         }
     }
 }
 
-void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b, const std::tuple<short, short, short>& color) {
+void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b, const std::tuple<short, short, short>& color, zbuffer& zbuf) {
     int dx = (b.first - a.first), dy = (b.second - a.second);
     bool drawnOff = false;
 
@@ -219,5 +261,9 @@ void screen::drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b
             }
         }
     }
+
+}
+
+void screen::drawScanLine(double x0, double x1, double y, const std::tuple<short, short, short>& color, zbuffer& zbuf) {
 
 }

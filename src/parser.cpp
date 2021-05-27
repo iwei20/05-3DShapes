@@ -93,7 +93,7 @@ void parser::parse(screen& s, std::istream& in) {
             box b{{x, y, z}, w, h, d};
             b.add_to(_s);
             _s = _t.get_top() * _s;
-            s.drawMatrix(_s, {255, 255, 255});
+            s.drawMatrix(_s, {255, 255, 255}, {100, 100, 100});
             _s = polygon_matrix();
         }
         if(line == "sphere") {
@@ -102,7 +102,7 @@ void parser::parse(screen& s, std::istream& in) {
             sphere sph{{x, y, z}, r, (int)r/5};
             sph.add_to(_s);
             _s = _t.get_top() * _s;
-            s.drawMatrix(_s, {255, 255, 255});
+            s.drawMatrix(_s, {255, 255, 255}, {100, 100, 100});
             _s = polygon_matrix();
         }
         if(line == "torus") {
@@ -111,7 +111,7 @@ void parser::parse(screen& s, std::istream& in) {
             torus t{{x, y, z}, r2, r1, (int)r2/2, (int)r1/2};
             t.add_to(_s);
             _s = _t.get_top() * _s;
-            s.drawMatrix(_s, {255, 255, 255});
+            s.drawMatrix(_s, {255, 255, 255}, {100, 100, 100});
             _s = polygon_matrix();
         }
         if(line == "display") {

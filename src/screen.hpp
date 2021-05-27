@@ -6,9 +6,19 @@ class screen;
 #include <ostream>
 #include <tuple>
 
+class zbuffer {
+    private:
+        std::vector<std::vector<double>> zvalues;
+    public:
+        zbuffer(unsigned long width, unsigned long height);
+
+        std::vector<double>& operator[](int index);
+};
+
 class screen {
     private:
         std::vector<std::vector<std::tuple<short, short, short>>> colorData;
+        zbuffer z;
         bool _invert = false;
         bool outbounds_message = true;
         bool outbounds(int x, int y);
@@ -57,10 +67,15 @@ class screen {
         /**
          * Draws polygon matrix to a screen.
          **/
-        void drawMatrix(const polygon_matrix& polygons, const std::tuple<short, short, short>& color);
+        void drawMatrix(const polygon_matrix& polygons, const std::tuple<short, short, short>& color, const std::tuple<short, short, short>& fill);
 
         /**
          * Draws a line from point a to point b. Keep in mind that these points are not (row, col), but (x, y). 
          **/ 
-        void drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b, const std::tuple<short, short, short>& color);
+        void drawLine(const std::pair<int, int>& a, const std::pair<int, int>& b, const std::tuple<short, short, short>& color, zbuffer& zbuf);
+
+        /**
+         * Draws a scanline
+         **/
+        void drawScanLine(double x0, double x1, double y, const std::tuple<short, short, short>& color, zbuffer& zbuf);
 };
