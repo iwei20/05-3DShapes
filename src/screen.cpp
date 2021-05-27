@@ -150,11 +150,11 @@ void screen::drawMatrix(const polygon_matrix& polygons, const std::tuple<short, 
             }
 
             // Edges 
-            
+            /*
             drawLine({polygons.get(0, i), polygons.get(1, i), polygons.get(2, i)}, {polygons.get(0, i + 1), polygons.get(1, i + 1), polygons.get(2, i + 1)}, color);
             drawLine({polygons.get(0, i + 1), polygons.get(1, i + 1),  polygons.get(2, i + 1)}, {polygons.get(0, i + 2), polygons.get(1, i + 2), polygons.get(2, i + 2)}, color);
             drawLine({polygons.get(0, i + 2), polygons.get(1, i + 2),  polygons.get(2, i + 2)}, {polygons.get(0, i), polygons.get(1, i), polygons.get(2, i)}, color);
-            
+            */
         }
     }
 }
