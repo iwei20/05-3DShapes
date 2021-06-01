@@ -314,6 +314,9 @@ void screen::drawScanLine(int x0, int x1, int y, double z0, double z1, const std
     double dz = (right_z - left_z) / (right_x - left_x + 1);
     double curr_z = left_z + dz;
     for(int i = left_x; i <= right_x; ++i) {
+        if(outbounds(i, y)) {
+            break;
+        }
         if(curr_z > zbuf[y][i]) {
             colorData[y][i] = color;
             zbuf[y][i] = curr_z;
