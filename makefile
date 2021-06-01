@@ -1,6 +1,8 @@
 sourcedir = src
 objdir = obj
 targetdir = bin
+CC = g++
+FLAGS = -g -rdynamic -Wall
 
 list = $(subst $(sourcedir),$(objdir),$(subst .cpp,.o,$(wildcard $(sourcedir)/*.cpp)))
 
@@ -17,12 +19,12 @@ build: $(targetdir)/main.out
 
 $(targetdir)/main.out: $(list) | $(targetdir)
 	@echo "Linking to executable..."
-	@g++ -o $@ $(list)
+	@$(CC) $(FLAGS) -o $@ $(list)
 	@echo "Executable $@ linked"
 
 $(list): $(objdir)/%.o : $(sourcedir)/%.cpp | $(objdir)
 	@echo "Compiling $(<F)"
-	@g++ -c $< -o $@
+	@$(CC) $(FLAGS) -c $< -o $@
 
 $(objdir):
 	@echo "Making object directory..."
