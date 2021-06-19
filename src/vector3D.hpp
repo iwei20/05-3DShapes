@@ -18,8 +18,10 @@ class vector3D {
         void operator+=(const vector3D& other);
         void operator-=(const vector3D& other);
 
+        static vector3D normalize(const vector3D& vec);
         static double dot(const vector3D& a, const vector3D& b);
         static vector3D cross(const vector3D& a, const vector3D& b);
 };
 vector3D operator+(const vector3D& a, const vector3D& b);
 vector3D operator-(const vector3D& a, const vector3D& b);
+vector3D operator*(const double scale, const vector3D& vec);

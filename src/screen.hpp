@@ -2,6 +2,7 @@
 
 class screen;
 
+#include "light_controller.hpp"
 #include "matrix.hpp"
 #include <ostream>
 #include <tuple>
@@ -20,6 +21,7 @@ class screen {
     private:
         std::vector<std::vector<std::tuple<short, short, short>>> colorData;
         zbuffer zbuf;
+        light_controller l;
         bool _invert = false;
         bool outbounds_message = true;
         bool outbounds(int x, int y);

@@ -18,7 +18,13 @@ void zbuffer::reset() {
     }
 }
 
-screen::screen(unsigned long width, unsigned long height) : colorData{height, std::vector<std::tuple<short, short, short>>(width)}, zbuf{width, height} {}
+screen::screen(unsigned long width, unsigned long height) : 
+    colorData{height, std::vector<std::tuple<short, short, short>>(width)}, 
+    zbuf{width, height}, 
+    l{{0.3, 0.3, 0.3}, {0.7, 0.7, 0.7}, {0.8, 0.8, 0.8}, 3, {0, 120, 0}} 
+{
+    l.add_light({1, 1, 1}, {0, 190, 190});
+}
 
 bool screen::outbounds(int x, int y) {
     return x < 0 || x >= colorData[0].size() || y < 0 || y >= colorData.size();
@@ -116,7 +122,11 @@ void screen::drawMatrix(const polygon_matrix& polygons, const std::tuple<short, 
                 }
             );
 
-            std::tuple<short, short, short> randColor = {rand() % 255, rand() % 255, rand() % 255};
+            vector3D normal = vector3D::cross(
+                vector3D(polygons.get(0, i + 1), polygons.get(1, i + 1), polygons.get(2, i + 1)) - vector3D(polygons.get(0, i), polygons.get(1, i), polygons.get(2, i)), // b - a
+                vector3D(polygons.get(0, i + 2), polygons.get(1, i + 2), polygons.get(2, i + 2)) - vector3D(polygons.get(0, i), polygons.get(1, i), polygons.get(2, i)) // c - a
+            );
+            std::tuple<short, short, short> randColor = l.calculate(normal);
             // Iterating from bottom to mid
             int curr_y = std::get<1>(points[0]),
                 mid_y = std::get<1>(points[1]),
